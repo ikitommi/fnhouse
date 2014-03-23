@@ -80,6 +80,7 @@
 (s/defschema AnnotatedHandler
   "A bundle of a resource-injected fnhouse handler with its HandlerInfo"
   {:info HandlerInfo
+   (s/optional-key :api) String
    :handler Handler})
 
 (s/defschema API [AnnotatedHandler])

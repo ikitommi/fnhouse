@@ -99,6 +99,7 @@
 (s/defschema AnnotatedProtoHandler
   "A bundle of a raw fnhouse handler with its HandlerInfo"
   {:info schemas/HandlerInfo
+   (s/optional-key :api) String
    :proto-handler (s/=> schemas/Response
                         {:request schemas/Request
                          :resources Resources})})
@@ -191,9 +192,10 @@
   (pfnk/fn->fnk
    (fn [all-resources]
      (for [proto-handler proto-handlers]
-       (letk [[proto-handler info] proto-handler]
+       (letk [[proto-handler api info] proto-handler]
          (let [resources (select-keys all-resources (keys (:resources (pfnk/input-schema proto-handler))))]
            {:info info
+            :api api
             :handler (pfnk/fn->fnk
                       (fn [request] (proto-handler {:request request :resources resources}))
                       (update-in (pfnk/io-schemata proto-handler) [0] :request {}))}))))
@@ -210,7 +212,7 @@
    segments without URI args."
   [handler-info :- schemas/HandlerInfo prefix :- String]
   (fnk-schema/assert-iae
-   (empty? (routes/uri-arg-ks prefix)) "Path prefix %s cannot contain uri args" prefix)
+    (empty? (routes/uri-arg-ks prefix)) "Path prefix %s cannot contain uri args" prefix)
   (update-in handler-info [:path] (partial str (ensure-leading-slash prefix))))
 
 (s/defn ns->handler-fns :- [AnnotatedProtoHandler]
@@ -237,6 +239,8 @@
   (->> prefix->ns-sym
        (mapcat (fn [[prefix ns-sym]]
                  (map (fn [annotated-handler]
-                        (update-in annotated-handler [:info] apply-path-prefix prefix))
+                        (-> annotated-handler
+                          (update-in [:info] apply-path-prefix prefix)
+                          (assoc :api prefix)))
                       (ns->handler-fns ns-sym (or extra-info-fn (constantly nil))))))
        curry-resources))

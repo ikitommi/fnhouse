@@ -14,7 +14,8 @@
    [fnhouse.routes :as routes]
    [guesthouse.guestbook :as guestbook]
    [guesthouse.ring :as ring]
-   [guesthouse.schemas :as schemas]))
+   [guesthouse.schemas :as schemas]
+   [guesthouse.swagger :as swagger]))
 
 (defn custom-coercion-middleware
   "Wrap a handler with the schema coercing middleware"
@@ -33,10 +34,13 @@
    When served, the handlers will be hosted at the 'guestbook' prefix."
   [resources]
   (->> resources
-       ((handlers/nss->handlers-fn {"guestbook" 'guesthouse.guestbook}))
+       ((handlers/nss->handlers-fn {"guestbook" 'guesthouse.guestbook
+                                    "api" 'guesthouse.swagger}))
+       (map (partial swagger/collect-swagger-info (:swagger resources)))
        (map custom-coercion-middleware)
        routes/root-handler
-       ring/ring-middleware))
+       ring/ring-middleware
+       swagger/docs))
 
 (defn start-api
   "Take resources and server options, and spin up a server with jetty"
@@ -44,3 +48,9 @@
   (-> resources
       wrapped-root-handler
       (jetty/run-jetty options)))
+
+(defn start []
+  (start-api {:guestbook (atom {})
+              :index (atom 0)
+              :swagger (atom {})}
+    {:port 8080 :join? false}))
