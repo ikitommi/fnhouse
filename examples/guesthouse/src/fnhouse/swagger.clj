@@ -1,4 +1,4 @@
-(ns guesthouse.swagger
+(ns fnhouse.swagger
   (:use plumbing.core)
   (:require
     [fnhouse.handlers :as handlers]
@@ -24,7 +24,7 @@
       :paramType "body"
       :type (ring-swagger/resolve-model-vars body)}]))
 
-(defn collect-swagger-info [swagger {{:keys [method path description request responses] :as info} :info api :api :as annotated-handler}]
+(defn collect-routes [swagger {{:keys [method path description request responses] :as info} :info api :api :as annotated-handler}]
   (swap! swagger
     update-in [api]
     update-in [:routes]
@@ -49,5 +49,5 @@
    [:resources swagger]]
   (ring-swagger/api-declaration {} @swagger api (ring-swagger/extract-basepath request)))
 
-(defn docs [handler]
+(defn swagger-ui [handler]
   (resource/wrap-resource handler "swagger-ui"))

@@ -12,10 +12,10 @@
    [fnhouse.handlers :as handlers]
    [fnhouse.middleware :as middleware]
    [fnhouse.routes :as routes]
+   [fnhouse.swagger :as swagger]
    [guesthouse.guestbook :as guestbook]
    [guesthouse.ring :as ring]
-   [guesthouse.schemas :as schemas]
-   [guesthouse.swagger :as swagger]))
+   [guesthouse.schemas :as schemas]))
 
 (defn custom-coercion-middleware
   "Wrap a handler with the schema coercing middleware"
@@ -35,12 +35,12 @@
   [resources]
   (->> resources
        ((handlers/nss->handlers-fn {"guestbook" 'guesthouse.guestbook
-                                    "api" 'guesthouse.swagger}))
-       (map (partial swagger/collect-swagger-info (:swagger resources)))
+                                    "api" 'fnhouse.swagger})) ; TODO: tag these not to get collected into swagger-docs
+       (map (partial swagger/collect-routes (:swagger resources)))
        (map custom-coercion-middleware)
        routes/root-handler
        ring/ring-middleware
-       swagger/docs))
+       swagger/swagger-ui))
 
 (defn start-api
   "Take resources and server options, and spin up a server with jetty"
