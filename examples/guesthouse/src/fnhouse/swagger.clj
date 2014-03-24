@@ -7,12 +7,6 @@
     [ring.middleware.resource :as resource]
     [clojure.string :as s]))
 
-(defn- create-uri [s]
-  (-> s
-    (s/replace #":(.[^:|/]*)" " :$1 ")
-    (s/split #" ")
-    (->> (map #(if (.startsWith % ":") (keyword (.substring % 1)) %)))))
-
 (defn- generate-nickname [annotated-handler]
   (str (:api annotated-handler) (get-in annotated-handler [:info :source-map :name])))
 
@@ -29,7 +23,7 @@
     update-in [api]
     update-in [:routes]
     conj {:method method
-          :uri (create-uri path)
+          :uri path
           :metadata {:summary description
                      :return (get responses 200)
                      :nickname (generate-nickname annotated-handler)
