@@ -43,11 +43,9 @@
    Then, wrap the root handler in some standard ring middleware.
    When served, the handlers will be hosted at the 'guestbook' prefix."
   [resources]
-  (->> resources
-       ((handlers/nss->handlers-fn {"guestbook" 'guesthouse.guestbook
-                                    "api" 'fnhouse.swagger}))
+  (->> (attach-docs resources {"guestbook" 'guesthouse.guestbook
+                               "api" 'fnhouse.swagger})
        (map (partial swagger/collect-routes (:swagger resources)))
-  ;;(->> (attach-docs resources {"guestbook" 'guesthouse.guestbook})
        (map custom-coercion-middleware)
        routes/root-handler
        ring/ring-middleware
