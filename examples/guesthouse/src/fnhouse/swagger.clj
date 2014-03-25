@@ -13,9 +13,8 @@
   (for [[type f] {:body :body, :query :query-params, :path :uri-args}]
     {:type type :model (f request)}))
 
-(defn collect-route! [swagger {{:keys [method path description request responses] :as info} :info api :api :as annotated-handler}]
-  (swap! swagger
-    update-in [api]
+(defn collect-route [swagger {{:keys [method path description request responses] :as info} :info api :api :as annotated-handler}]
+  (update-in swagger [api]
     update-in [:routes]
     conj {:method method
           :uri path
@@ -24,8 +23,7 @@
                      :nickname (generate-nickname annotated-handler)
                      :parameters (convert-parameters request)}}))
 
-(defn collect-routes! [swagger handlers]
-  (doseq [handler handlers] (collect-route! swagger handler)))
+(defn collect-routes [handlers] (reduce collect-route {} handlers))
 
 (defn swagger-ui [handler]
   (resource/wrap-resource handler "swagger-ui"))
