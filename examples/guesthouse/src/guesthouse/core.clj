@@ -29,10 +29,14 @@
 (defn attach-docs [resources prefix->ns-sym]
   (let [proto-handlers (-> prefix->ns-sym
                            (assoc "docs" 'fnhouse.docs)
+                           (assoc "api" 'fnhouse.swagger)
                            handlers/nss->proto-handlers)
-        all-docs (docs/all-docs (map :info proto-handlers))]
+        all-docs (docs/all-docs (map :info proto-handlers))
+        swagger (atom {})]
+    (swagger/collect-routes! swagger proto-handlers)
     (-> resources
         (assoc :api-docs all-docs)
+        (assoc :swagger @swagger)
         ((handlers/curry-resources proto-handlers)))))
 
 (defn wrapped-root-handler
@@ -43,9 +47,7 @@
    Then, wrap the root handler in some standard ring middleware.
    When served, the handlers will be hosted at the 'guestbook' prefix."
   [resources]
-  (->> (attach-docs resources {"guestbook" 'guesthouse.guestbook
-                               "api" 'fnhouse.swagger})
-       (map (partial swagger/collect-route (:swagger resources)))
+  (->> (attach-docs resources {"guestbook" 'guesthouse.guestbook})
        (map custom-coercion-middleware)
        routes/root-handler
        ring/ring-middleware
@@ -60,6 +62,5 @@
 
 (defn start []
   (start-api {:guestbook (atom {})
-              :index (atom 0)
-              :swagger (atom {})}
+              :index (atom 0)}
     {:port 8080 :join? false}))
