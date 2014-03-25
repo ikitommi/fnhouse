@@ -35,7 +35,7 @@
   [resources]
   (->> resources
        ((handlers/nss->handlers-fn {"guestbook" 'guesthouse.guestbook
-                                    "api" 'fnhouse.swagger})) ; TODO: tag these not to get collected into swagger-docs
+                                    "api" 'fnhouse.swagger}))
        (map (partial swagger/collect-routes (:swagger resources)))
        (map custom-coercion-middleware)
        routes/root-handler

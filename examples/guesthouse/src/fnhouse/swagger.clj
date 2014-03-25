@@ -10,14 +10,6 @@
 (defn- generate-nickname [annotated-handler]
   (str (:api annotated-handler) (get-in annotated-handler [:info :source-map :name])))
 
-(defn body-parameter [body]
-  (if body
-    [{:name (-> body schema/schema-name str .toLowerCase)
-      :description ""
-      :required true
-      :paramType "body"
-      :type (ring-swagger/resolve-model-vars body)}]))
-
 (defn collect-routes [swagger {{:keys [method path description request responses] :as info} :info api :api :as annotated-handler}]
   (swap! swagger
     update-in [api]
@@ -27,7 +19,10 @@
           :metadata {:summary description
                      :return (get responses 200)
                      :nickname (generate-nickname annotated-handler)
-                     :parameters (body-parameter (:body request))}})
+                     :parameters [{:type :body
+                                   :model (:body request)}
+                                  {:type :query
+                                   :model (:query-params request)}]}})
   annotated-handler)
 
 (defnk $api-docs$GET
