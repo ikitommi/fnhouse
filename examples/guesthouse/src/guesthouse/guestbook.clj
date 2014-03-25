@@ -1,6 +1,5 @@
 (ns guesthouse.guestbook
-  "A set of handlers for adding, viewing, searching for,
-   and deleting guestbook entries"
+  {:doc "A set of handlers for adding, viewing, searching for, and deleting guestbook entries"}
   (:use plumbing.core)
   (:require
    [schema.core :as s]
