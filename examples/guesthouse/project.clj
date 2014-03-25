@@ -7,7 +7,7 @@
                  [prismatic/fnhouse "0.1.0-SNAPSHOT"]
                  [org.clojure/clojure "1.5.1"]
                  [clj-http "0.9.1"]
-                 [metosin/ring-swagger "0.8.0"]
+                 [metosin/ring-swagger "0.8.1"]
                  [metosin/ring-swagger-ui "2.0.12-1"]
                  [ring/ring-core "1.2.2"]
                  [ring/ring-jetty-adapter "1.2.2"]
