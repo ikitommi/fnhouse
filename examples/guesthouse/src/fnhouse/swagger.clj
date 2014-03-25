@@ -9,7 +9,11 @@
 (defn- generate-nickname [annotated-handler]
   (str (:api annotated-handler) (get-in annotated-handler [:info :source-map :name])))
 
-(defn collect-routes [swagger {{:keys [method path description request responses] :as info} :info api :api :as annotated-handler}]
+(defn- convert-parameters [request]
+  (for [[type f] {:body :body, :query :query-params, :path :uri-args}]
+    {:type type :model (f request)}))
+
+(defn collect-route [swagger {{:keys [method path description request responses] :as info} :info api :api :as annotated-handler}]
   (swap! swagger
     update-in [api]
     update-in [:routes]
@@ -18,12 +22,7 @@
           :metadata {:summary description
                      :return (get responses 200)
                      :nickname (generate-nickname annotated-handler)
-                     :parameters [{:type :body
-                                   :model (:body request)}
-                                  {:type :query
-                                   :model (:query-params request)}
-                                  {:type :path
-                                   :model (:uri-args request)}]}})
+                     :parameters (convert-parameters request)}})
   annotated-handler)
 
 (defnk $api-docs$GET

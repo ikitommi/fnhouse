@@ -45,7 +45,7 @@
   [resources]
   (->> (attach-docs resources {"guestbook" 'guesthouse.guestbook
                                "api" 'fnhouse.swagger})
-       (map (partial swagger/collect-routes (:swagger resources)))
+       (map (partial swagger/collect-route (:swagger resources)))
        (map custom-coercion-middleware)
        routes/root-handler
        ring/ring-middleware
