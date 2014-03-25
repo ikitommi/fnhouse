@@ -3,9 +3,8 @@
   (:require
     [fnhouse.handlers :as handlers]
     [ring.swagger.core :as ring-swagger]
-    [schema.core :as schema]
-    [ring.middleware.resource :as resource]
-    [clojure.string :as s]))
+    [schema.core :as s]
+    [ring.middleware.resource :as resource]))
 
 (defn- generate-nickname [annotated-handler]
   (str (:api annotated-handler) (get-in annotated-handler [:info :source-map :name])))
@@ -22,18 +21,20 @@
                      :parameters [{:type :body
                                    :model (:body request)}
                                   {:type :query
-                                   :model (:query-params request)}]}})
+                                   :model (:query-params request)}
+                                  {:type :path
+                                   :model (:uri-args request)}]}})
   annotated-handler)
 
 (defnk $api-docs$GET
   "Apidocs"
-  {:responses {200 schema/Any}}
+  {:responses {200 s/Any}}
   [[:resources swagger]]
   (ring-swagger/api-listing {} @swagger))
 
 (defnk $api-docs$:api$GET
   "Apidoc"
-  {:responses {200 schema/Any}}
+  {:responses {200 s/Any}}
   [[:request [:uri-args api :- String] :as request]
    [:resources swagger]]
   (ring-swagger/api-declaration {} @swagger api (ring-swagger/extract-basepath request)))
