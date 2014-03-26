@@ -18,6 +18,8 @@ details).
 
 Demo of fnHouse integrated with [ring-swagger](https://github.com/metosin/ring-swagger).
 
+Install fnHouse locally (`lein install` on this repo root).
+
 ```clojure
 lein repl
 ;; nREPL server started on port 56496 on host 127.0.0.1
