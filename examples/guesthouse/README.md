@@ -38,5 +38,14 @@ user=> (start)
 ;; #<Server org.eclipse.jetty.server.Server@2c6d8073>
 user=>
 ```
-& browse to http://localhost:8080/index.html
+
+and browse to http://localhost:8080/index.html
+
+## Resource listing
+
+![](https://raw.githubusercontent.com/ikitommi/fnhouse/master/examples/guesthouse/guesthouse-swagger.png)
+
+## Using the services
+
+![](https://raw.githubusercontent.com/ikitommi/fnhouse/master/examples/guesthouse/guesthouse-swagger2.png)
 
