@@ -99,7 +99,7 @@
 (s/defschema AnnotatedProtoHandler
   "A bundle of a raw fnhouse handler with its HandlerInfo"
   {:info schemas/HandlerInfo
-   (s/optional-key :api) String
+   (s/optional-key :resource) String
    :proto-handler (s/=> schemas/Response
                         {:request schemas/Request
                          :resources Resources})})
@@ -192,10 +192,10 @@
   (pfnk/fn->fnk
    (fn [all-resources]
      (for [proto-handler proto-handlers]
-       (letk [[proto-handler api info] proto-handler]
+       (letk [[proto-handler resource info] proto-handler]
          (let [resources (select-keys all-resources (keys (:resources (pfnk/input-schema proto-handler))))]
            {:info info
-            :api api
+            :resource resource
             :handler (pfnk/fn->fnk
                       (fn [request] (proto-handler {:request request :resources resources}))
                       (update-in (pfnk/io-schemata proto-handler) [0] :request {}))}))))
@@ -223,6 +223,7 @@
   (for [var (vals (ns-interns ns-sym))
         :when (fnhouse-handler? var)]
     {:info (var->handler-info var extra-info-fn)
+     :resource (str ns-sym)
      :proto-handler (pfnk/fn->fnk (fn redefable [m] (@var m))
                                   (pfnk/io-schemata @var))}))
 
@@ -239,7 +240,7 @@
                  (map (fn [annotated-handler]
                         (-> annotated-handler
                           (update-in [:info] apply-path-prefix prefix)
-                          (assoc :api prefix)))
+                          (assoc :resource prefix)))
                       (ns->handler-fns ns-sym (or extra-info-fn (constantly nil))))))))
 
 (s/defn nss->handlers-fn :- (s/=> schemas/API Resources)

@@ -43,15 +43,21 @@
     (is (thrown? Exception (handlers/var->handler-info #'$:a$:a$GET)))
     (ns-unmap 'fnhouse.handlers-test '$:a$:a$GET)))
 
+(deftest ns->handler-fns-test
+  (letk [[resource] (singleton (handlers/ns->handler-fns 'fnhouse.handlers-test (constantly nil)))]
+    (println resource)))
+
 (deftest nss->handlers-fn-test
   (let [annotation-fn (fn-> meta (select-keys [:auth-level :private]))
         handlers-fn (handlers/nss->handlers-fn {"my-test" 'fnhouse.handlers-test} annotation-fn)
         data-store (atom [])
         annotated-handlers (handlers-fn {:data-store data-store :more-junk 117})]
     (letk [[handler
+            resource
             [:info resources responses method path description annotations
              [:request uri-args body query-params]]]
            (singleton annotated-handlers)]
+      (is (= resource "my-test"))
       (is (= {:uri-arg s/Int :handler String} uri-args))
       (is (= {s/Keyword s/Any :body-arg s/Keyword} body))
       (is (= {s/Keyword s/Any :qp1 String (s/optional-key :qp2) s/Int} query-params))
