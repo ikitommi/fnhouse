@@ -44,8 +44,8 @@
     (ns-unmap 'fnhouse.handlers-test '$:a$:a$GET)))
 
 (deftest ns->handler-fns-test
-  (letk [[resource] (singleton (handlers/ns->handler-fns 'fnhouse.handlers-test (constantly nil)))]
-    (println resource)))
+  (let [{:keys [resource]} (singleton (handlers/ns->handler-fns 'fnhouse.handlers-test (constantly nil)))]
+    (is (= resource nil))))
 
 (deftest nss->handlers-fn-test
   (let [annotation-fn (fn-> meta (select-keys [:auth-level :private]))

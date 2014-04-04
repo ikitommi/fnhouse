@@ -223,7 +223,6 @@
   (for [var (vals (ns-interns ns-sym))
         :when (fnhouse-handler? var)]
     {:info (var->handler-info var extra-info-fn)
-     :resource (str ns-sym)
      :proto-handler (pfnk/fn->fnk (fn redefable [m] (@var m))
                                   (pfnk/io-schemata @var))}))
 
