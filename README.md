@@ -1,3 +1,9 @@
+# Moved, we have.
+
+Moved codes to a separate [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger) repo.
+
+# The old
+
 ![fnhouse!](https://raw.github.com/wiki/prismatic/fnhouse/images/fnhouse.jpg)
 
 Leiningen dependency (Clojars): `[prismatic/fnhouse "0.1.0"]`
